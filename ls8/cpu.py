@@ -87,26 +87,28 @@ class CPU:
             self.execute_instruction(ir, operand_a, operand_b)
 
     def execute_instruction(self, instruction, operand_a, operand_b):
-        if instruction == HLT:
-            self.halted = True
-            self.pc += self.number_of_operands(instruction)
-        elif instruction == PRN:
-            print(self.reg[operand_a])
-            self.pc += self.number_of_operands(instruction)
-        elif instruction == LDI:
-            self.reg[operand_a] = operand_b
-            self.pc += self.number_of_operands(instruction)
-        elif instruction == MUL:
-            self.alu(instruction, operand_a, operand_b)
-            self.pc += self.number_of_operands(instruction)
-        else:
-            print("INVALID INSTRUCTION.")
-    
-    def number_of_operands(self, instruction):
         # Instruction layout: 'AABCDDDD'
         # * AA = Number of operands for this opcode, 0-2
+        # * B == 1 if this is an ALU operation
+        # * C == 1 if this instruction sets the PC
+        # * DDDD Instruction identifier
         # INSTRUCTION = 0b10000010 # >> 6 --> 0b10 & 0b11 --> 0b10
-        return ((instruction >> 6) & 0b11) + 1
+        is_alu = instruction >> 5 & 0b1               # 0 or 1
+        sets_pc = instruction >> 4 & 0b1              # 0 or 1
+        num_operands = (instruction >> 6 & 0b11) + 1  # 0, 1, 2
+
+        if not sets_pc:
+            if instruction == HLT:
+                self.halted = True
+            elif instruction == PRN:
+                print(self.reg[operand_a])
+            elif instruction == LDI:
+                self.reg[operand_a] = operand_b
+            elif is_alu:
+                self.alu(instruction, operand_a, operand_b)
+            else:
+                print("INVALID INSTRUCTION.")
+            self.pc += num_operands
 
     def ram_read(self, MAR): # Memory Address Register
         return self.ram[MAR]
