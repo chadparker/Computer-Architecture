@@ -54,6 +54,9 @@ class CPU:
         else:
             raise Exception("Unsupported ALU operation")
 
+        # keep value in 0-255
+        self.reg[reg_a] = self.reg[reg_a] & 0xFF
+
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
