@@ -27,7 +27,6 @@ class CPU:
         """Load a program into memory."""
 
         address = 0
-        program = []
 
         with open(filename) as f:
             for line in f:
@@ -36,14 +35,10 @@ class CPU:
 
                 try:
                     x = int(maybe_binary_number, 2)
-                    program.append(x)
+                    self.ram_write(x, address)
+                    address += 1
                 except:
                     continue
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
-
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
