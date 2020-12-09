@@ -109,10 +109,10 @@ class CPU:
                 value = self.reg[register_address]
                 self.ram[self.reg[7]] = value
             elif instruction == POP:
-                # TODO: check for underflow
                 register_address = self.ram[self.pc + 1]
                 self.reg[register_address] = self.ram[self.reg[7]]
-                self.reg[7] += 1
+                if self.reg[7] < 0xF4: # prevent underflow
+                    self.reg[7] += 1
             elif is_alu:
                 self.alu(instruction, operand_a, operand_b)
             else:
