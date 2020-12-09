@@ -113,6 +113,9 @@ class CPU:
                 self.reg[register_address] = self.ram[self.reg[7]]
                 if self.reg[7] < 0xF4: # prevent underflow
                     self.reg[7] += 1
+                else:
+                    print("ERROR: stack underflow")
+                    sys.exit(1)
             elif is_alu:
                 self.alu(instruction, operand_a, operand_b)
             else:
