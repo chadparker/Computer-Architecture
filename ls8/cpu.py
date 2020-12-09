@@ -7,6 +7,7 @@ LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
 ADD = 0b10100000
+PUSH = 0b01000101
 
 class CPU:
     """Main CPU class."""
@@ -100,6 +101,12 @@ class CPU:
                 print(self.reg[operand_a])
             elif instruction == LDI:
                 self.reg[operand_a] = operand_b
+            elif instruction == PUSH:
+                # TODO: check for overflow
+                self.reg[7] -= 1
+                register_address = self.ram[self.pc + 1]
+                value = self.reg[register_address]
+                self.ram[self.reg[7]] = value
             elif is_alu:
                 self.alu(instruction, operand_a, operand_b)
             else:
