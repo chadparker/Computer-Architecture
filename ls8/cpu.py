@@ -24,6 +24,7 @@ class CPU:
         self.mdr = 0
         self.fl = 0
         self.halted = False
+        self.end_of_program = 0
 
     def load(self, filename):
         """Load a program into memory."""
@@ -41,6 +42,7 @@ class CPU:
                     address += 1
                 except:
                     continue
+        self.end_of_program = address
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -103,8 +105,11 @@ class CPU:
             elif instruction == LDI:
                 self.reg[operand_a] = operand_b
             elif instruction == PUSH:
-                # TODO: check for overflow
-                self.reg[7] -= 1
+                if self.reg[7] > self.end_of_program + 1: # prevent overflow
+                    self.reg[7] -= 1
+                else:
+                    print("ERROR: stack overflow")
+                    sys.exit(1)
                 register_address = self.ram[self.pc + 1]
                 value = self.reg[register_address]
                 self.ram[self.reg[7]] = value
