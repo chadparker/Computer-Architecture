@@ -8,6 +8,7 @@ PRN = 0b01000111
 MUL = 0b10100010
 ADD = 0b10100000
 PUSH = 0b01000101
+POP = 0b01000110
 
 class CPU:
     """Main CPU class."""
@@ -107,6 +108,11 @@ class CPU:
                 register_address = self.ram[self.pc + 1]
                 value = self.reg[register_address]
                 self.ram[self.reg[7]] = value
+            elif instruction == POP:
+                # TODO: check for underflow
+                register_address = self.ram[self.pc + 1]
+                self.reg[register_address] = self.ram[self.reg[7]]
+                self.reg[7] += 1
             elif is_alu:
                 self.alu(instruction, operand_a, operand_b)
             else:
