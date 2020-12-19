@@ -10,6 +10,7 @@ ADD = 0b10100000
 PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
+RET = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -136,6 +137,10 @@ class CPU:
                 # jumps to the address stored in that register
                 register_to_get_value_from = self.ram[self.pc + 1]
                 self.pc = self.reg[register_to_get_value_from]
+            elif instruction == RET:
+                # doesn't take in any operands. sets the program counter to topmost element of the stack and pop it
+                self.pc = self.ram[self.reg[7]]
+                self.reg[7] += 1
 
     def ram_read(self, MAR): # Memory Address Register
         return self.ram[MAR]
