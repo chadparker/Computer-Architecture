@@ -9,6 +9,8 @@ MUL = 0b10100010
 ADD = 0b10100000
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -93,9 +95,9 @@ class CPU:
         # * C == 1 if this instruction sets the PC
         # * DDDD Instruction identifier
         # INSTRUCTION = 0b10000010 # >> 6 --> 0b10 & 0b11 --> 0b10
-        is_alu = instruction >> 5 & 0b1               # 0 or 1
-        sets_pc = instruction >> 4 & 0b1              # 0 or 1
-        num_operands = (instruction >> 6 & 0b11) + 1  # 0, 1, 2
+        is_alu = instruction >> 5 & 0b1          # 0 or 1
+        sets_pc = instruction >> 4 & 0b1         # 0 or 1
+        num_operands = (instruction >> 6 & 0b11) # 0, 1, 2
 
         if not sets_pc:
             if instruction == HLT:
@@ -125,7 +127,20 @@ class CPU:
                 self.alu(instruction, operand_a, operand_b)
             else:
                 print("INVALID INSTRUCTION.")
-            self.pc += num_operands
+            self.pc += num_operands + 1
+        else: # sets self.pc
+            if instruction == CALL:
+                # stores the address of the next instruction on top of the stack
+                self.reg[7] -= 1
+                address_of_next_instruction = self.pc + 2
+                self.ram[self.reg[7]] = address_of_next_instruction
+                # jumps to the address stored in that register
+                register_to_get_value_from = self.ram[self.pc + 1]
+                self.pc = self.reg[register_to_get_value_from]
+            elif instruction == RET:
+                # doesn't take in any operands. sets the program counter to topmost element of the stack and pop it
+                self.pc = self.ram[self.reg[7]]
+                self.reg[7] += 1
 
     def ram_read(self, MAR): # Memory Address Register
         return self.ram[MAR]
