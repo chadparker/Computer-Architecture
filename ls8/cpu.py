@@ -9,6 +9,7 @@ MUL = 0b10100010
 ADD = 0b10100000
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
 
 class CPU:
     """Main CPU class."""
@@ -126,6 +127,15 @@ class CPU:
             else:
                 print("INVALID INSTRUCTION.")
             self.pc += num_operands + 1
+        else: # sets self.pc
+            if instruction == CALL:
+                # stores the address of the next instruction on top of the stack
+                self.reg[7] -= 1
+                address_of_next_instruction = self.pc + 2
+                self.ram[self.reg[7]] = address_of_next_instruction
+                # jumps to the address stored in that register
+                register_to_get_value_from = self.ram[self.pc + 1]
+                self.pc = self.reg[register_to_get_value_from]
 
     def ram_read(self, MAR): # Memory Address Register
         return self.ram[MAR]
